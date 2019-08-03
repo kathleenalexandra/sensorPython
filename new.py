@@ -42,7 +42,7 @@ def handle_data(handle, value):
     print("Received data: %s" % hexlify(value))
 
 
-
+# for converting hex to signed int
 
 def twos_complement(hexstr,bits):
 
@@ -62,25 +62,6 @@ list_swap_array = [1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14, 17, 16,
 
 # for interpoleting the SensorTile into a usable format
 
-def convert_ST_data(input_split_list, orientation_output):
-
-    input_split_list = [input_split_list[4].replace("value=0xb", "").replace("'", "")[2 * i:2 * i + 2] for i in range(20)]
-
-    input_split_list = [input_split_list[i] for i in list_swap_array]
-
-    for i in range(9, -1, -1):
-
-        input_split_list[2 * i:2 * (i + 1)] = ["".join(input_split_list[2 * i:2 * (i + 1)])]
-
-    #input_split_list = [twos_complement(input_split_list[i], 16) for i in range(len(input_split_list))]
-
-  # orientation_output[0] = round(math.sqrt(input_split_list[1] ** 2 + input_split_list[2] ** 2 + input_split_list[3] ** 2), 2)
-
-   # orientation_output[1] = round(math.acos(input_split_list[3] / orientation_output[0]) * RADIAN, 2)
-
-    #orientation_output[2] = round(math.atan2(input_split_list[2], input_split_list[1]) * RADIAN, 2)
-
-   # return(orientation_output)
 
 
 # for orientation calculations
@@ -181,5 +162,48 @@ filepath = 'logfile.log'
 
 file = open(filepath, 'r+')
 
+
 counter = 0
 
+
+# Example logfile line:
+
+# "Received notification on handle=0x11, value=0xb'383b13017cfe6a032a0070002a0092fe2dfe5900 - 2019-08-02 21:23:56,270"
+
+
+orientation_variables = [0,0,0]
+
+
+# continuously loop the SensorTile interpolation
+
+while True:
+
+    line = file.readline()
+
+    if not line:
+
+        time.sleep(0.1)
+
+        continue
+
+    counter += 1
+
+    split_line = line.split()
+
+    if split_line[0] == "Received":
+
+        print("recieved")
+        #print(convert_ST_data(split_line, orientation_variables))
+
+    else:
+
+        print("---")
+
+
+    # reset the logfile every 1000 lines to make sure it doesn't get too big
+
+    if counter >= 1000:
+
+        file.truncate(0)
+
+        counter = 0
