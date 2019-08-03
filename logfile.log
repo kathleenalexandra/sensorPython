@@ -1,0 +1,1 @@
+gatttool_cmd=gatttool -i hci0 -I
